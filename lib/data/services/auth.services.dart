@@ -119,19 +119,27 @@ class AuthService {
       print('StackTrace: $stackTrace');
 
       final statusCode = e.response?.statusCode;
+      final errorData = e.response?.data;
 
       if (statusCode == 400 || statusCode == 500) {
-        final errorData = e.response?.data;
-
         if (errorData != null &&
             errorData.toString().contains('Duplicate entry')) {
           EasyLoading.showError('Data sudah ada. Silakan coba lagi.');
         } else {
           EasyLoading.showError(
-            errorData?['message'] ?? 'Terjadi kesalahan memproses data',
+            errorData?['message'] ?? 'Terjadi kesalahan memproses data.',
           );
         }
-      } else {
+      }
+      else if (statusCode == 404) {
+        EasyLoading.showError(
+          errorData?['message'] ?? 'Data tidak ditemukan di server.',
+        );
+      }
+      else if (statusCode == 401) {
+        EasyLoading.showError('Akses tidak diizinkan. Silakan login ulang.');
+      }
+      else {
         EasyLoading.showError('Tidak dapat terhubung ke server.');
       }
 
